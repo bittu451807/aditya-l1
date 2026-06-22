@@ -19,7 +19,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- UNBLOCKABLE CINEMATIC BACKGROUND & IRON MAN J.A.R.V.I.S UI ---
+# --- UNBLOCKABLE CINEMATIC BACKGROUND & GLASS UI ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap');
@@ -133,16 +133,13 @@ st.markdown("""
         animation: pulse-dot 1.5s infinite;
     }
     
-    /* ----------------------------------------------------
-       J.A.R.V.I.S / IRON MAN THEMED SIDEBAR (Flight Controls)
-       ---------------------------------------------------- */
+    /* J.A.R.V.I.S THEMED SIDEBAR */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #090b14 0%, #0b1c2c 100%) !important;
         border-right: 2px solid #00E5FF !important;
         box-shadow: inset -5px 0 25px rgba(0, 229, 255, 0.15) !important;
     }
     
-    /* Tactical HUD Grid Overlay in Background */
     [data-testid="stSidebar"]::before {
         content: "";
         position: absolute;
@@ -160,7 +157,6 @@ st.markdown("""
         position: relative;
     }
 
-    /* Arc Reactor Glowing Sliders */
     .stSlider > div > div > div > div {
         background-color: #00E5FF !important; 
         box-shadow: 0 0 8px #00E5FF;
@@ -171,7 +167,6 @@ st.markdown("""
         box-shadow: 0 0 12px #FF1744 !important;
     }
     
-    /* Iron Man Armor Buttons */
     .stButton > button {
         background: linear-gradient(135deg, #00E5FF 0%, #0083B0 100%) !important;
         color: #050505 !important;
@@ -192,7 +187,6 @@ st.markdown("""
         transform: scale(1.02);
     }
     
-    /* Sleek Radio Buttons */
     .stRadio label {
         color: #00E5FF !important;
         font-family: 'Orbitron', sans-serif;
@@ -301,11 +295,10 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# --- SIDEBAR FLIGHT CONTROLS (J.A.R.V.I.S THEME) ---
+# --- SIDEBAR FLIGHT CONTROLS ---
 st.sidebar.markdown("<h2 style='color:#00E5FF; font-family:Orbitron, sans-serif; text-align:center; text-shadow: 0 0 10px #00E5FF; margin-bottom:20px;'>J.A.R.V.I.S. INTERFACE</h2>", unsafe_allow_html=True)
 
 mode = st.sidebar.radio("MISSION PROTOCOL", ["Live Ops Dashboard", "Judge Hardware Upload"])
-
 st.sidebar.markdown("<br>", unsafe_allow_html=True)
 
 speed_selection = st.sidebar.select_slider(
@@ -450,7 +443,7 @@ else:
         first_spike_idx = np.where(val_future_check >= 2)[0][0]
         lead_time_est = f"WARNING: ~{round((first_spike_idx * 10) / 60, 1)} MINS"
 
-    # --- REAL PHYSICS METRIC CARDS (100% Authentic Data) ---
+    # --- REAL PHYSICS METRIC CARDS ---
     cm1, cm2, cm3, cm4 = st.columns(4)
     with cm1:
         st.markdown(f"<div class='premium-card' style='padding:20px;'><small style='color:#B0BEC5; font-family:Orbitron; font-weight:700;'>CURRENT TIME</small><div style='font-size:2rem; font-family:Orbitron; font-weight:900; color:#FFFFFF; margin-top:4px;'>{str(latest_tick['time'])[11:19]}</div></div>", unsafe_allow_html=True)
@@ -458,11 +451,10 @@ else:
         peak_flux = chunk['soft_flux'].max()
         st.markdown(f"<div class='premium-card' style='padding:20px;'><small style='color:#00E5FF; font-family:Orbitron; font-weight:700;'>PEAK RADIATION HIT</small><div style='font-size:2rem; font-family:Orbitron; font-weight:900; color:#00E5FF; margin-top:4px;'>{peak_flux:.2e}</div></div>", unsafe_allow_html=True)
     with cm3:
-        # Bulletproof NumPy 2.0 Integration Fix
         try:
-            total_energy = np.trapezoid(chunk['soft_flux'].fillna(0).values) # New NumPy
+            total_energy = np.trapezoid(chunk['soft_flux'].fillna(0).values)
         except AttributeError:
-            total_energy = np.trapz(chunk['soft_flux'].fillna(0).values) # Old NumPy
+            total_energy = np.trapz(chunk['soft_flux'].fillna(0).values)
             
         st.markdown(f"<div class='premium-card' style='padding:20px;'><small style='color:#FFD700; font-family:Orbitron; font-weight:700;'>TOTAL ENERGY (FLUENCE)</small><div style='font-size:2rem; font-family:Orbitron; font-weight:900; color:#FFD700; margin-top:4px;'>{total_energy:.2e}</div></div>", unsafe_allow_html=True)
     with cm4:
@@ -484,7 +476,7 @@ else:
     tab_ctrl, tab_real_space, tab_logs, tab_explain = st.tabs(["📊 LIVE DATA FEED", "🪐 NASA 3D SOLAR VIEW", "🗄️ HISTORY LOGS", "🧠 HOW THE AI THINKS"])
 
     # ---------------------------------------------------------
-    # TAB 1: THE FULL-WIDTH VERTICAL MASTER FEED (1 to 7)
+    # TAB 1: THE FULL-WIDTH VERTICAL MASTER FEED 
     # ---------------------------------------------------------
     with tab_ctrl:
         
@@ -492,16 +484,22 @@ else:
         st.markdown("<div class='premium-card'><h3 style='margin-bottom:5px;'>1. The Sun's Background Heat (SoLEXS)</h3><div class='explanation-text'>Think of this as the sun's base temperature. When a solar storm is building up, this blue line slowly starts to rise. All data plotted is directly from the uploaded CSVs.</div>", unsafe_allow_html=True)
         fig_sol = go.Figure()
         fig_sol.add_trace(go.Scatter(x=chunk["time"], y=chunk["soft_flux"], name="SoLEXS", line=dict(color="#00E5FF", width=3, shape='spline')))
-        fig_sol.update_layout(template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color="#FFFFFF", family="Inter"), margin=dict(l=10, r=10, t=10, b=10))
-        st.plotly_chart(fig_sol, use_container_width=True)
+        fig_sol.update_layout(
+            template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color="#FFFFFF", family="Inter"), margin=dict(l=10, r=10, t=10, b=10),
+            xaxis_title="Time (Local)", yaxis_title="Heat Level (Soft X-Ray Flux)"
+        )
+        st.plotly_chart(fig_sol, use_container_width=True, config={'displayModeBar': False})
         st.markdown("</div>", unsafe_allow_html=True)
 
         # 2. HEL1OS Graph
         st.markdown("<div class='premium-card'><h3 style='margin-bottom:5px;'>2. Sudden Sparks & Explosions (HEL1OS)</h3><div class='explanation-text'>This doesn't track heat; it tracks violent explosions. When you see this purple line spike suddenly, it means a flare has just ignited.</div>", unsafe_allow_html=True)
         fig_hel = go.Figure()
         fig_hel.add_trace(go.Scatter(x=chunk["time"], y=chunk["hard_flux"], name="HEL1OS", line=dict(color="#B388FF", width=3, shape='spline')))
-        fig_hel.update_layout(template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color="#FFFFFF", family="Inter"), margin=dict(l=10, r=10, t=10, b=10))
-        st.plotly_chart(fig_hel, use_container_width=True)
+        fig_hel.update_layout(
+            template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color="#FFFFFF", family="Inter"), margin=dict(l=10, r=10, t=10, b=10),
+            xaxis_title="Time (Local)", yaxis_title="Explosion Level (Hard X-Ray Flux)"
+        )
+        st.plotly_chart(fig_hel, use_container_width=True, config={'displayModeBar': False})
         st.markdown("</div>", unsafe_allow_html=True)
 
         # 3. Fused Signature
@@ -509,26 +507,42 @@ else:
         fig_curve = go.Figure()
         fig_curve.add_trace(go.Scatter(x=chunk["time"], y=chunk["soft_flux"], name="Heat Wave", line=dict(color="#00E5FF", width=3.5, shape='spline')))
         fig_curve.add_trace(go.Scatter(x=chunk["time"], y=chunk["hard_flux"], name="Sparks", line=dict(color="#B388FF", width=3.5, shape='spline')))
-        fig_curve.update_layout(template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color="#FFFFFF", family="Inter"), margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.1, x=0.2))
-        st.plotly_chart(fig_curve, use_container_width=True)
+        fig_curve.update_layout(
+            template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color="#FFFFFF", family="Inter"), margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.1, x=0.2),
+            xaxis_title="Time (Local)", yaxis_title="Total Radiation Intensity"
+        )
+        st.plotly_chart(fig_curve, use_container_width=True, config={'displayModeBar': False})
         st.markdown("</div>", unsafe_allow_html=True)
             
         # 4. AI Forecast
-        st.markdown("<div class='premium-card'><h3 style='margin-bottom:5px;'>4. Where is it heading? (AI Forecast)</h3><div class='explanation-text'>We don't just look at the past. Our AI calculates the current momentum to predict where the radiation will be in 60 minutes. The shaded area shows our margin of error.</div>", unsafe_allow_html=True)
-        future_times = pd.date_range(start=latest_tick['time'], periods=60, freq='min')
+        st.markdown("<div class='premium-card'><h3 style='margin-bottom:5px;'>4. Where is it heading? (AI Forecast)</h3><div class='explanation-text'>We don't just look at the past. Our AI calculates the current momentum to predict where the radiation will be in the near future. The glowing green line shows EXACTLY where we are right now, moving forward as data streams in.</div>", unsafe_allow_html=True)
+        
+        if len(chunk) > 1:
+            time_step = chunk['time'].diff().mean()
+        else:
+            time_step = pd.Timedelta(seconds=1)
+            
+        if pd.isna(time_step): time_step = pd.Timedelta(seconds=1)
+        
+        future_times = [latest_tick['time'] + (time_step * i) for i in range(1, 61)]
         current_trend = chunk['flare_score'].diff().mean()
         if pd.isna(current_trend): current_trend = 0
+        
         forecast_vals = [latest_tick['flare_score'] + (current_trend * i) for i in range(1, 61)]
         upper_bound = [v + (0.15 * (i/10)) for i, v in enumerate(forecast_vals)]
         lower_bound = [v - (0.15 * (i/10)) for i, v in enumerate(forecast_vals)]
         
         fig_cast = go.Figure()
         fig_cast.add_trace(go.Scatter(x=chunk['time'], y=chunk['flare_score'], mode='lines', name="What Happened", line=dict(color="#00E5FF", width=3)))
-        fig_cast.add_vline(x=latest_tick['time'], line_dash="dash", line_color="white", annotation_text="YOU ARE HERE", annotation_position="top left", annotation_font=dict(color="white"))
+        fig_cast.add_vline(x=latest_tick['time'], line_dash="dash", line_color="#00FF7F", annotation_text="CURRENT TIME", annotation_position="top left", annotation_font=dict(color="#00FF7F", size=14, family="Orbitron"))
         fig_cast.add_trace(go.Scatter(x=future_times, y=forecast_vals, mode='lines', name="AI Prediction", line=dict(color="#FF1744", width=3, dash="dash")))
         fig_cast.add_trace(go.Scatter(x=list(future_times)+list(future_times)[::-1], y=upper_bound+lower_bound[::-1], fill='toself', fillcolor='rgba(255, 23, 68, 0.15)', line=dict(color='rgba(255,255,255,0)'), name="Margin of Error"))
-        fig_cast.update_layout(template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color="#FFFFFF", family="Inter"), margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.1, x=0.1))
-        st.plotly_chart(fig_cast, use_container_width=True)
+        
+        fig_cast.update_layout(
+            template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color="#FFFFFF", family="Inter"), margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.1, x=0.1),
+            xaxis_title="Timeline (Past to Future)", yaxis_title="AI Threat Score (Volatility)"
+        )
+        st.plotly_chart(fig_cast, use_container_width=True, config={'displayModeBar': False})
         st.markdown("</div>", unsafe_allow_html=True)
 
         # 5. Physics Check: QPP Power Spectrum 
@@ -538,24 +552,23 @@ else:
         qpp_active = False
         
         if len(flux_vals) >= 30:
-            # Step 1: Detrend the data
             x_idx = np.arange(len(flux_vals))
             poly = np.polyfit(x_idx, flux_vals, 2)
             trend = np.polyval(poly, x_idx)
             detrended = flux_vals - trend
             
-            # Step 2: FFT Math
             yf = rfft(detrended)
             xf = rfftfreq(len(detrended), 1.0)
             power = np.abs(yf)**2
             
-            # Step 3: Graph it
             fig_qpp = go.Figure()
             fig_qpp.add_trace(go.Scatter(x=xf[1:], y=power[1:], mode='lines', name="Power Spectrum", line=dict(color="#FF1744", width=2), fill='tozeroy'))
-            fig_qpp.update_layout(template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', xaxis_title="Frequency (Vibrations)", yaxis_title="Pulse Strength", margin=dict(l=10, r=10, t=10, b=10))
-            st.plotly_chart(fig_qpp, use_container_width=True)
+            fig_qpp.update_layout(
+                template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=10, r=10, t=10, b=10),
+                xaxis_title="Pulse Speed (Frequency in Hz)", yaxis_title="Pulse Strength (Power)"
+            )
+            st.plotly_chart(fig_qpp, use_container_width=True, config={'displayModeBar': False})
             
-            # Decide if heartbeat is strong enough
             qpp_active = len(power) > 3 and np.max(power[3:]) > (np.mean(power[3:]) * 5)
 
         if qpp_active:
@@ -580,11 +593,14 @@ else:
         fig_phase = px.scatter(
             chunk_copy, x="hard_flux", y="soft_derivative", color="flare_score",
             color_continuous_scale=["#00FF7F", "#00E5FF", "#FFD700", "#FF1744"],
-            labels={"hard_flux": "Size of Explosion", "soft_derivative": "Speed of Heating"}
+            labels={"hard_flux": "Size of Explosion (Hard X-Ray)", "soft_derivative": "Speed of Heating (Soft X-Ray Change)"}
         )
         fig_phase.update_traces(mode='markers', marker=dict(size=10, opacity=0.9))
-        fig_phase.update_layout(template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color="#FFFFFF"), margin=dict(l=10, r=10, t=10, b=10))
-        st.plotly_chart(fig_phase, use_container_width=True)
+        fig_phase.update_layout(
+            template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color="#FFFFFF"), margin=dict(l=10, r=10, t=10, b=10),
+            xaxis_title="Particle Explosion Size (Hard Flux)", yaxis_title="Speed of Heating (Soft Flux Change)"
+        )
+        st.plotly_chart(fig_phase, use_container_width=True, config={'displayModeBar': False})
         st.markdown("</div>", unsafe_allow_html=True)
 
         # 7. AI Risk Horizon
@@ -701,14 +717,20 @@ else:
 
                         x_df = pd.DataFrame({"Feature": list(xai_mapping.keys()), "Weight": list(xai_mapping.values())})
                         fig_x = px.bar(x_df, x="Weight", y="Feature", orientation="h", color_discrete_sequence=['#00E5FF'])
-                        fig_x.update_layout(template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=280, margin=dict(l=10,r=10,t=10,b=10), font=dict(color="#FFFFFF"))
-                        st.plotly_chart(fig_x, use_container_width=True)
+                        fig_x.update_layout(
+                            template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=280, margin=dict(l=10,r=10,t=10,b=10), font=dict(color="#FFFFFF"),
+                            xaxis_title="Importance Weight (%)", yaxis_title=""
+                        )
+                        st.plotly_chart(fig_x, use_container_width=True, config={'displayModeBar': False})
                         
                     with col_an2:
                         st.markdown("<h4 style='color:#00E5FF; margin-bottom:5px;'>How confident is the AI?</h4><div class='explanation-text'>This shows the AI's exact percentage chance for every threat level. If the purple bar for 'Severe' is high, it is absolutely certain a storm is hitting.</div>", unsafe_allow_html=True)
                         fig_p = px.bar(x=["Safe", "Minor", "Warning", "Severe"], y=probs, color_discrete_sequence=['#B388FF'])
-                        fig_p.update_layout(template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=280, margin=dict(l=10,r=10,t=10,b=10), font=dict(color="#FFFFFF"))
-                        st.plotly_chart(fig_p, use_container_width=True)
+                        fig_p.update_layout(
+                            template="plotly_dark", paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=280, margin=dict(l=10,r=10,t=10,b=10), font=dict(color="#FFFFFF"),
+                            xaxis_title="Threat Class", yaxis_title="AI Confidence Probability (%)"
+                        )
+                        st.plotly_chart(fig_p, use_container_width=True, config={'displayModeBar': False})
             else:
                 st.error("Model Engine Interface Unreachable.")
                     
